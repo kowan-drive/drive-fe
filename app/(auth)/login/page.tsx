@@ -56,7 +56,7 @@ export default function LoginPage() {
             }
 
             // Store token and user data
-            setToken(verifyResponse.data.sessionToken)
+            setToken(verifyResponse.data.session.token)
             setUser(verifyResponse.data.user)
 
             toast.success('Login successful!')
