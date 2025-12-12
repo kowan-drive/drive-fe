@@ -3,7 +3,7 @@ import { create } from 'zustand'
 export interface FileItem {
     id: string
     name: string
-    size: number
+    size: string // Changed from number to match backend response (BigInt serialized as string)
     mimeType: string
     folderId: string | null
     ownerId: string
@@ -20,16 +20,24 @@ export interface FolderItem {
     updatedAt: string
 }
 
+export interface BreadcrumbItem {
+    id: string
+    name: string
+}
+
 interface FilesState {
     files: FileItem[]
     folders: FolderItem[]
     currentFolderId: string | null
+    breadcrumbs: BreadcrumbItem[]
     uploadProgress: Record<string, number>
     isLoading: boolean
 
     setFiles: (files: FileItem[]) => void
     setFolders: (folders: FolderItem[]) => void
     setCurrentFolderId: (folderId: string | null) => void
+    setBreadcrumbs: (breadcrumbs: BreadcrumbItem[]) => void
+    navigateToFolder: (folder: FolderItem | null) => void
     setUploadProgress: (fileId: string, progress: number) => void
     clearUploadProgress: (fileId: string) => void
     setLoading: (loading: boolean) => void
@@ -43,12 +51,27 @@ export const useFilesStore = create<FilesState>((set) => ({
     files: [],
     folders: [],
     currentFolderId: null,
+    breadcrumbs: [],
     uploadProgress: {},
     isLoading: false,
 
     setFiles: (files) => set({ files }),
     setFolders: (folders) => set({ folders }),
     setCurrentFolderId: (folderId) => set({ currentFolderId: folderId }),
+    setBreadcrumbs: (breadcrumbs) => set({ breadcrumbs }),
+    
+    navigateToFolder: (folder) => set((state) => {
+        if (!folder) {
+            // Navigate to root
+            return { currentFolderId: null, breadcrumbs: [] }
+        }
+        
+        // Navigate to folder - add to breadcrumbs
+        return {
+            currentFolderId: folder.id,
+            breadcrumbs: [...state.breadcrumbs, { id: folder.id, name: folder.name }]
+        }
+    }),
 
     setUploadProgress: (fileId, progress) =>
         set((state) => ({

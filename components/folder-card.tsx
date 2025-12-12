@@ -23,10 +23,10 @@ interface FolderCardProps {
 
 export default function FolderCard({ folder, viewMode, onUpdate }: FolderCardProps) {
     const [isDeleting, setIsDeleting] = useState(false)
-    const { setCurrentFolderId } = useFilesStore()
+    const { navigateToFolder } = useFilesStore()
 
     const handleClick = () => {
-        setCurrentFolderId(folder.id)
+        navigateToFolder(folder)
     }
 
     const handleDelete = async (e: React.MouseEvent) => {

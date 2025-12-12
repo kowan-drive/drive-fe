@@ -36,15 +36,19 @@ export default function CreateFolderDialog({
         setIsCreating(true)
 
         try {
-            await foldersApi.createFolder({
+            const response = await foldersApi.createFolder({
                 name: folderName,
                 parentId: currentFolderId || undefined,
             })
 
-            toast.success('Folder created successfully')
-            setFolderName('')
-            onFolderCreated()
-            onOpenChange(false)
+            if (response.success) {
+                toast.success('Folder created successfully')
+                setFolderName('')
+                onOpenChange(false)
+                onFolderCreated()
+            } else {
+                toast.error(response.error || 'Failed to create folder')
+            }
         } catch (error) {
             console.error('Create folder error:', error)
             toast.error('Failed to create folder')
