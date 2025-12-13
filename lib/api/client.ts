@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 const apiClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
@@ -13,17 +13,9 @@ apiClient.interceptors.request.use(
     (config) => {
         // Try to get token from localStorage (for persisted sessions)
         if (typeof window !== 'undefined') {
-            const authStorage = localStorage.getItem('auth-storage')
-            if (authStorage) {
-                try {
-                    const parsed = JSON.parse(authStorage)
-                    const token = parsed.state?.token
-                    if (token) {
-                        config.headers.Authorization = `Bearer ${token}`
-                    }
-                } catch (e) {
-                    console.error('Failed to parse auth storage:', e)
-                }
+            const token = localStorage.getItem('session_token')
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`
             }
         }
         return config
@@ -35,16 +27,27 @@ apiClient.interceptors.request.use(
 
 // Response interceptor for error handling
 apiClient.interceptors.response.use(
-    (response) => response,
-    (error) => {
+    (response) => {
+        // Check if response has error in data (success: false)
+        if (response.data && response.data.success === false) {
+            // Reject so it can be caught and handled by the API functions
+            return Promise.reject(response.data)
+        }
+        return response
+    },
+    (error: AxiosError) => {
+        // Extract error from response
+        const errorData = error.response?.data as any
+        
+        // Handle 401 unauthorized - clear token, but let API functions handle the error display
         if (error.response?.status === 401) {
-            // Clear auth storage and redirect to login
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('auth-storage')
-                window.location.href = '/login'
+                localStorage.removeItem('session_token')
             }
         }
-        return Promise.reject(error)
+        
+        // Return the error data so API functions can handle it
+        return Promise.reject(errorData || error)
     }
 )
 

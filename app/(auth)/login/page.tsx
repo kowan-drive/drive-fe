@@ -63,7 +63,8 @@ export default function LoginPage() {
             router.push('/drive')
         } catch (error: any) {
             console.error('Login error:', error)
-            toast.error(error.message || 'Login failed. Please try again.')
+            // Error is already handled by authApi with toast notification
+            // handleApiError is called in the API layer
         } finally {
             setIsLoading(false)
         }
