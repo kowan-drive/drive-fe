@@ -35,7 +35,7 @@ export default function ShareDialog({ file, open, onOpenChange }: ShareDialogPro
             })
 
             if (response.success) {
-                const link = `${window.location.origin}/share/${response.data.shareToken}`
+                const link = `${window.location.origin}/share/${response.data.token}`
                 setShareLink(link)
                 toast.success('Share link created')
             }

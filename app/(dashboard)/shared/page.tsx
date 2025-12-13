@@ -22,7 +22,7 @@ export default function SharedPage() {
         try {
             const response = await sharesApi.listShares()
             if (response.success) {
-                setShares(response.data.shares || [])
+                setShares(response.data || [])
             }
         } catch (error) {
             console.error('Error loading shares:', error)
@@ -32,8 +32,8 @@ export default function SharedPage() {
         }
     }
 
-    const handleCopyLink = async (shareToken: string) => {
-        const link = `${window.location.origin}/share/${shareToken}`
+    const handleCopyLink = async (token: string) => {
+        const link = `${window.location.origin}/share/${token}`
         try {
             await navigator.clipboard.writeText(link)
             toast.success('Link copied to clipboard')
@@ -96,21 +96,21 @@ export default function SharedPage() {
                                         <div className="flex-1 min-w-0 space-y-2">
                                             <div className="flex items-center gap-2">
                                                 <h3 className="font-medium truncate">{share.file?.name || 'Unknown File'}</h3>
-                                                <Badge variant={share.isActive ? 'default' : 'secondary'}>
-                                                    {share.isActive ? 'Active' : 'Expired'}
+                                                <Badge variant="default">
+                                                    Active
                                                 </Badge>
                                             </div>
                                             <div className="text-sm text-muted-foreground space-y-1">
                                                 <p>Created: {formatDate(share.createdAt)}</p>
                                                 <p>Expires: {formatDate(share.expiresAt)}</p>
-                                                <p>Downloads: {share.downloadCount} / {share.maxDownloads}</p>
+                                                <p>Downloads: {share.downloadCount} / {share.maxDownloads || '∞'}</p>
                                             </div>
                                         </div>
                                         <div className="flex gap-2">
                                             <Button
                                                 variant="outline"
                                                 size="icon"
-                                                onClick={() => handleCopyLink(share.shareToken)}
+                                                onClick={() => handleCopyLink(share.token)}
                                             >
                                                 <Copy className="h-4 w-4" />
                                             </Button>
