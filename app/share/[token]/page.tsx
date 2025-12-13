@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { formatDistanceToNow } from 'date-fns'
+import { sharesApi } from '@/lib/api/shares'
 
 interface ShareInfo {
     presignedUrl: string
@@ -38,15 +39,15 @@ export default function SharePage() {
     useEffect(() => {
         async function fetchShareInfo() {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/shares/${token}/info`)
-                const data = await response.json()
+                const response = await sharesApi.getShareInfo(token)
 
-                if (!data.success) {
-                    throw new Error(data.error || 'Failed to load share')
+                if (!response.success) {
+                    throw new Error(response.error || 'Failed to load share')
                 }
 
-                setShareInfo(data.data)
+                setShareInfo(response.data)
             } catch (err) {
+                console.error('Share fetch error:', err)
                 setError(err instanceof Error ? err.message : 'Failed to load share')
             } finally {
                 setIsLoading(false)
@@ -64,18 +65,23 @@ export default function SharePage() {
         setIsDownloading(true)
         try {
             // Access the share (this increments download count and returns presigned URL)
-            window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/shares/${token}`
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+            window.location.href = `${apiUrl}/api/v1/shares/${token}`
             
             // Refresh share info after download to update remaining downloads
             setTimeout(async () => {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/shares/${token}/info`)
-                const data = await response.json()
-                if (data.success) {
-                    setShareInfo(data.data)
+                try {
+                    const response = await sharesApi.getShareInfo(token)
+                    if (response.success) {
+                        setShareInfo(response.data)
+                    }
+                } catch (err) {
+                    console.error('Failed to refresh share info:', err)
                 }
                 setIsDownloading(false)
             }, 2000)
         } catch (err) {
+            console.error('Download error:', err)
             setError('Failed to download file')
             setIsDownloading(false)
         }

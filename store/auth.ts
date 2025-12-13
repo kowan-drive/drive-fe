@@ -18,6 +18,7 @@ interface AuthState {
     setUser: (user: User | null) => void
     setToken: (token: string | null) => void
     setLoading: (loading: boolean) => void
+    refreshUser: () => Promise<void>
     logout: () => void
     setHasHydrated: (hasHydrated: boolean) => void
 }
@@ -38,6 +39,19 @@ export const useAuthStore = create<AuthState>()(
             },
 
             setLoading: (loading) => set({ isLoading: loading }),
+
+            refreshUser: async () => {
+                try {
+                    // Import dynamically to avoid circular dependency
+                    const { authApi } = await import('@/lib/api/auth')
+                    const response = await authApi.getCurrentUser()
+                    if (response.success && response.data) {
+                        set({ user: response.data })
+                    }
+                } catch (error) {
+                    console.error('Failed to refresh user:', error)
+                }
+            },
 
             logout: () => {
                 set({ user: null, token: null, isAuthenticated: false })

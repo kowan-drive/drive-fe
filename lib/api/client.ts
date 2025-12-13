@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios'
+import { useAuthStore } from '@/store/auth'
 
 const apiClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
@@ -11,11 +12,18 @@ const apiClient = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
     (config) => {
-        // Try to get token from localStorage (for persisted sessions)
+        // Try to get token from Zustand persisted storage
         if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('session_token')
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`
+            try {
+                const authStorage = localStorage.getItem('auth-storage')
+                if (authStorage) {
+                    const { state } = JSON.parse(authStorage)
+                    if (state?.token) {
+                        config.headers.Authorization = `Bearer ${state.token}`
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to parse auth storage:', error)
             }
         }
         return config
@@ -39,10 +47,11 @@ apiClient.interceptors.response.use(
         // Extract error from response
         const errorData = error.response?.data as any
         
-        // Handle 401 unauthorized - clear token, but let API functions handle the error display
+        // Handle 401 unauthorized - clear auth state
         if (error.response?.status === 401) {
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('session_token')
+                // Use the store's logout method to properly clear all auth state
+                useAuthStore.getState().logout()
             }
         }
         

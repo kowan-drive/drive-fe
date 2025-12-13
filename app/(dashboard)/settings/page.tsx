@@ -56,7 +56,9 @@ export default function SettingsPage() {
       const response = await subscriptionsApi.upgradeTier({ tier: tier as any })
       if (response.success) {
         toast.success(`Successfully upgraded to ${tier}`)
-        window.location.reload()
+        // Refresh user data and usage without full page reload
+        await useAuthStore.getState().refreshUser()
+        await loadData()
       }
     } catch (error) {
       console.error('Upgrade error:', error)

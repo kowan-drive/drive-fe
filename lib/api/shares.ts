@@ -18,6 +18,16 @@ export const sharesApi = {
         }
     },
 
+    getShareInfo: async (shareToken: string) => {
+        try {
+            const response = await apiClient.get(`/api/v1/shares/${shareToken}/info`)
+            return response.data
+        } catch (error: any) {
+            handleApiError(error, 'get share info')
+            throw error
+        }
+    },
+
     listShares: async () => {
         try {
             const response = await apiClient.get('/api/v1/shares')
