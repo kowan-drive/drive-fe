@@ -98,7 +98,7 @@ export default function DashboardLayout({
                                 <HardDrive className="h-5 w-5 text-primary-foreground" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold">MiniDrive</h1>
+                                <h1 className="text-xl font-bold">Vibedrive</h1>
                                 <p className="text-[10px] text-muted-foreground">Privacy-first storage</p>
                             </div>
                         </div>

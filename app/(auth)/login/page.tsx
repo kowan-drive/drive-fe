@@ -87,7 +87,7 @@ export default function LoginPage() {
                         Welcome Back
                     </CardTitle>
                     <CardDescription className="text-center text-base">
-                        Sign in to your MiniDrive account using biometric authentication
+                        Sign in to your Vibedrive account using biometric authentication
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleLogin}>

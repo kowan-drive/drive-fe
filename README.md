@@ -1,4 +1,4 @@
-# MiniDrive Frontend
+# Vibedrive Frontend
 
 A beautiful, privacy-first cloud storage frontend built with Next.js and shadcn/ui.
 
@@ -30,7 +30,7 @@ A beautiful, privacy-first cloud storage frontend built with Next.js and shadcn/
    ```env
    NEXT_PUBLIC_API_URL=http://localhost:3001
    NEXT_PUBLIC_WEBAUTHN_RP_ID=localhost
-   NEXT_PUBLIC_APP_NAME=MiniDrive
+   NEXT_PUBLIC_APP_NAME=Vibedrive
    ```
 
 3. Run the development server:
@@ -156,7 +156,7 @@ pnpm lint
 |----------|-------------|---------|
 | `NEXT_PUBLIC_API_URL` | Backend API URL | `http://localhost:3001` |
 | `NEXT_PUBLIC_WEBAUTHN_RP_ID` | WebAuthn Relying Party ID | `localhost` |
-| `NEXT_PUBLIC_APP_NAME` | Application name | `MiniDrive` |
+| `NEXT_PUBLIC_APP_NAME` | Application name | `Vibedrive` |
 
 ## 📦 Tech Stack
 

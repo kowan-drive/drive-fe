@@ -117,7 +117,7 @@ export default function RegisterPage() {
                         Create Account
                     </CardTitle>
                     <CardDescription className="text-center text-base">
-                        Set up your MiniDrive account with biometric security
+                        Set up your Vibedrive account with biometric security
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleRegister}>

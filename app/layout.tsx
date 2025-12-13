@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MiniDrive - Privacy-First Cloud Storage",
+  title: "Vibedrive - Privacy-First Cloud Storage",
   description: "Secure, serverless cloud storage with zero-knowledge encryption",
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider defaultTheme="system" storageKey="minidrive-theme">
+        <ThemeProvider defaultTheme="system" storageKey="vibedrive-theme">
           <AuthInitializer>
             {children}
           </AuthInitializer>

@@ -173,7 +173,7 @@ export default function SharePage() {
                     </Button>
 
                     <p className="text-xs text-muted-foreground text-center">
-                        This file was shared securely with MiniDrive
+                        This file was shared securely with Vibedrive
                     </p>
                 </CardContent>
             </Card>
