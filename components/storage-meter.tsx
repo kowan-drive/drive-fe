@@ -10,10 +10,19 @@ import { HardDrive } from 'lucide-react'
 export default function StorageMeter() {
     const [usage, setUsage] = useState<any>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [refreshKey, setRefreshKey] = useState(0)
 
     useEffect(() => {
         loadUsage()
-    }, [])
+        
+        // Listen for storage update events
+        const handleStorageUpdate = () => {
+            setRefreshKey(prev => prev + 1)
+        }
+        
+        window.addEventListener('storage-updated', handleStorageUpdate)
+        return () => window.removeEventListener('storage-updated', handleStorageUpdate)
+    }, [refreshKey])
 
     const loadUsage = async () => {
         try {
@@ -37,9 +46,9 @@ export default function StorageMeter() {
         )
     }
 
-    const usedBytes = usage.usedBytes || 0
-    const quotaBytes = usage.quotaBytes || 52428800 // 50MB default
-    const percentage = (usedBytes / quotaBytes) * 100
+    const usedBytes = usage.storageUsed || 0
+    const quotaBytes = usage.quota || 52428800 // 50MB default
+    const percentage = usage.usagePercentage || 0
 
     const getColor = () => {
         if (percentage >= 90) return 'destructive'

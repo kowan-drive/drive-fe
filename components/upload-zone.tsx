@@ -9,6 +9,7 @@ import { useFilesStore } from '@/store/files'
 import { filesApi } from '@/lib/api/files'
 import { formatBytes } from '@/lib/utils'
 import { toast } from 'sonner'
+import { triggerStorageUpdate } from '@/lib/storage-events'
 
 interface UploadZoneProps {
     open: boolean
@@ -104,6 +105,7 @@ export default function UploadZone({ open, onOpenChange, onUploadComplete }: Upl
         setIsUploading(false)
         toast.success('Files uploaded successfully')
         setUploadFiles([])
+        triggerStorageUpdate()
         onUploadComplete()
         onOpenChange(false)
     }

@@ -18,8 +18,14 @@ export default function DashboardLayout({
 }) {
     const router = useRouter()
     const { user, isAuthenticated, setUser, logout } = useAuthStore()
+    const hasHydrated = useAuthStore((state) => state.hasHydrated)
 
     useEffect(() => {
+        // Wait for hydration before checking auth
+        if (!hasHydrated) {
+            return
+        }
+
         if (!isAuthenticated) {
             router.push('/login')
             return
@@ -29,7 +35,7 @@ export default function DashboardLayout({
         if (!user) {
             loadUser()
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, hasHydrated, user])
 
     const loadUser = async () => {
         try {
@@ -53,6 +59,11 @@ export default function DashboardLayout({
             logout()
             router.push('/login')
         }
+    }
+
+    // Show nothing while hydrating
+    if (!hasHydrated) {
+        return null
     }
 
     if (!isAuthenticated) {

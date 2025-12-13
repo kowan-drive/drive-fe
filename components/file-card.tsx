@@ -28,6 +28,7 @@ import { filesApi } from '@/lib/api/files'
 import { FileItem } from '@/store/files'
 import { toast } from 'sonner'
 import ShareDialog from './share-dialog'
+import { triggerStorageUpdate } from '@/lib/storage-events'
 
 interface FileCardProps {
     file: FileItem
@@ -79,6 +80,7 @@ export default function FileCard({ file, viewMode, onUpdate }: FileCardProps) {
         try {
             await filesApi.deleteFile(file.id)
             toast.success('File deleted')
+            triggerStorageUpdate()
             onUpdate()
         } catch (error) {
             console.error('Delete error:', error)

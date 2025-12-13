@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface User {
     id: string
@@ -13,37 +14,51 @@ interface AuthState {
     token: string | null
     isLoading: boolean
     isAuthenticated: boolean
+    hasHydrated: boolean
     setUser: (user: User | null) => void
     setToken: (token: string | null) => void
     setLoading: (loading: boolean) => void
     logout: () => void
+    setHasHydrated: (hasHydrated: boolean) => void
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-    user: null,
-    token: typeof window !== 'undefined' ? localStorage.getItem('session_token') : null,
-    isLoading: false,
-    isAuthenticated: false,
+export const useAuthStore = create<AuthState>()(
+    persist(
+        (set, get) => ({
+            user: null,
+            token: null,
+            isLoading: false,
+            isAuthenticated: false,
+            hasHydrated: false,
 
-    setUser: (user) => set({ user, isAuthenticated: !!user }),
+            setUser: (user) => set({ user, isAuthenticated: !!user }),
 
-    setToken: (token) => {
-        if (typeof window !== 'undefined') {
-            if (token) {
-                localStorage.setItem('session_token', token)
-            } else {
-                localStorage.removeItem('session_token')
-            }
+            setToken: (token) => {
+                set({ token, isAuthenticated: !!token })
+            },
+
+            setLoading: (loading) => set({ isLoading: loading }),
+
+            logout: () => {
+                set({ user: null, token: null, isAuthenticated: false })
+            },
+
+            setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+        }),
+        {
+            name: 'auth-storage',
+            storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({
+                user: state.user,
+                token: state.token,
+            }),
+            onRehydrateStorage: () => (state) => {
+                if (state) {
+                    // Set isAuthenticated based on token after hydration
+                    state.isAuthenticated = !!state.token
+                    state.hasHydrated = true
+                }
+            },
         }
-        set({ token, isAuthenticated: !!token })
-    },
-
-    setLoading: (loading) => set({ isLoading: loading }),
-
-    logout: () => {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('session_token')
-        }
-        set({ user: null, token: null, isAuthenticated: false })
-    },
-}))
+    )
+)

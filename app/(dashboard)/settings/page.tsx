@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Progress } from '@/components/ui/progress'
 import { authApi } from '@/lib/api/auth'
 import { subscriptionsApi } from '@/lib/api/subscriptions'
 import { useAuthStore } from '@/store/auth'
 import { formatBytes } from '@/lib/utils'
-import { Crown, Loader2 } from 'lucide-react'
+import { Crown, Loader2, Check, HardDrive } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function SettingsPage() {
@@ -35,7 +36,7 @@ export default function SettingsPage() {
       }
 
       if (tiersResponse.success) {
-        setTiers(tiersResponse.data.tiers || [])
+        setTiers(tiersResponse.data || [])
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -98,7 +99,10 @@ export default function SettingsPage() {
         {/* Storage Usage */}
         <Card>
           <CardHeader>
-            <CardTitle>Storage Usage</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <HardDrive className="h-5 w-5" />
+              Storage Usage
+            </CardTitle>
             <CardDescription>How much storage you're using</CardDescription>
           </CardHeader>
           <CardContent>
@@ -107,20 +111,31 @@ export default function SettingsPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : usage ? (
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Used</span>
-                  <span className="font-medium">{formatBytes(usage.usedBytes || 0)}</span>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium">{formatBytes(usage.storageUsed || 0)} used</span>
+                    <span className="text-muted-foreground">{formatBytes(usage.quota || 0)} total</span>
+                  </div>
+                  <Progress value={usage.usagePercentage || 0} className="h-2" />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {formatBytes(usage.remaining || 0)} available • {usage.usagePercentage || 0}% used
+                  </p>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total</span>
-                  <span className="font-medium">{formatBytes(usage.quotaBytes || 0)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Available</span>
-                  <span className="font-medium">
-                    {formatBytes((usage.quotaBytes || 0) - (usage.usedBytes || 0))}
-                  </span>
+                <Separator />
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-2xl font-bold">{formatBytes(usage.storageUsed || 0)}</p>
+                    <p className="text-xs text-muted-foreground">Used</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{formatBytes(usage.quota || 0)}</p>
+                    <p className="text-xs text-muted-foreground">Total</p>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold">{formatBytes(usage.remaining || 0)}</p>
+                    <p className="text-xs text-muted-foreground">Available</p>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -132,7 +147,7 @@ export default function SettingsPage() {
         {/* Subscription Tiers */}
         <Card>
           <CardHeader>
-            <CardTitle>Subscription Tiers</CardTitle>
+            <CardTitle>Subscription Plans</CardTitle>
             <CardDescription>Choose the plan that fits your needs</CardDescription>
           </CardHeader>
           <CardContent>
@@ -141,31 +156,59 @@ export default function SettingsPage() {
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-3">
-                {tiers.map((tier) => (
-                  <Card
-                    key={tier.name}
-                    className={user?.tier === tier.name ? 'border-primary' : ''}
-                  >
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        {tier.name}
-                        {tier.name !== 'FREE' && <Crown className="h-4 w-4 text-yellow-500" />}
-                      </CardTitle>
-                      <CardDescription>{formatBytes(tier.quotaBytes)}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button
-                        className="w-full"
-                        variant={user?.tier === tier.name ? 'secondary' : 'default'}
-                        onClick={() => handleUpgrade(tier.name)}
-                        disabled={user?.tier === tier.name}
-                      >
-                        {user?.tier === tier.name ? 'Current Plan' : 'Upgrade'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="grid gap-6 md:grid-cols-3">
+                {tiers.map((tier) => {
+                  const isCurrentTier = user?.tier === tier.name
+                  const isPremium = tier.name !== 'FREE'
+                  
+                  return (
+                    <Card
+                      key={tier.name}
+                      className={isCurrentTier ? 'border-primary shadow-md' : 'border-muted'}
+                    >
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="flex items-center gap-2">
+                            {tier.name}
+                            {isPremium && <Crown className="h-4 w-4 text-yellow-500" />}
+                          </CardTitle>
+                          {isCurrentTier && (
+                            <Badge variant="default">Current</Badge>
+                          )}
+                        </div>
+                        <CardDescription>
+                          <span className="text-2xl font-bold text-foreground">
+                            {tier.price === 0 ? 'Free' : `$${tier.price}`}
+                          </span>
+                          {tier.price !== 0 && <span className="text-muted-foreground">/month</span>}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold">{tier.quotaFormatted} Storage</p>
+                          {tier.features && (
+                            <ul className="space-y-2">
+                              {tier.features.map((feature: string, index: number) => (
+                                <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                                  <span>{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                        <Button
+                          className="w-full"
+                          variant={isCurrentTier ? 'secondary' : 'default'}
+                          onClick={() => handleUpgrade(tier.name)}
+                          disabled={isCurrentTier}
+                        >
+                          {isCurrentTier ? 'Current Plan' : 'Upgrade Now'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
               </div>
             )}
           </CardContent>

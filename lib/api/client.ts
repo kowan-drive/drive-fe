@@ -5,14 +5,26 @@ const apiClient = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true,
 })
 
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('session_token')
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
+        // Try to get token from localStorage (for persisted sessions)
+        if (typeof window !== 'undefined') {
+            const authStorage = localStorage.getItem('auth-storage')
+            if (authStorage) {
+                try {
+                    const parsed = JSON.parse(authStorage)
+                    const token = parsed.state?.token
+                    if (token) {
+                        config.headers.Authorization = `Bearer ${token}`
+                    }
+                } catch (e) {
+                    console.error('Failed to parse auth storage:', e)
+                }
+            }
         }
         return config
     },
@@ -26,9 +38,9 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Clear token and redirect to login
-            localStorage.removeItem('session_token')
+            // Clear auth storage and redirect to login
             if (typeof window !== 'undefined') {
+                localStorage.removeItem('auth-storage')
                 window.location.href = '/login'
             }
         }
