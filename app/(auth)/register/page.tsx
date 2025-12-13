@@ -74,12 +74,22 @@ export default function RegisterPage() {
 
     if (isSuccess) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-800 p-4">
-                <Card className="w-full max-w-md shadow-2xl">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4 relative overflow-hidden">
+                {/* Animated background elements */}
+                <div className="absolute inset-0 overflow-hidden">
+                    <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
+                    <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
+                </div>
+
+                <Card className="w-full max-w-md shadow-2xl border-green-500/20 relative backdrop-blur-sm bg-card/95">
                     <CardContent className="py-12">
                         <div className="flex flex-col items-center space-y-4 text-center">
-                            <CheckCircle2 className="h-16 w-16 text-green-500 animate-in zoom-in duration-300" />
-                            <h2 className="text-2xl font-bold">Registration Successful!</h2>
+                            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center shadow-xl">
+                                <CheckCircle2 className="h-10 w-10 text-white animate-in zoom-in duration-300" />
+                            </div>
+                            <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+                                Registration Successful!
+                            </h2>
                             <p className="text-muted-foreground">
                                 Redirecting you to login...
                             </p>
@@ -91,18 +101,29 @@ export default function RegisterPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-800 p-4">
-            <Card className="w-full max-w-md shadow-2xl">
-                <CardHeader className="space-y-1">
-                    <CardTitle className="text-3xl font-bold text-center">Create Account</CardTitle>
-                    <CardDescription className="text-center">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4 relative overflow-hidden">
+            {/* Animated background elements */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
+            </div>
+
+            <Card className="w-full max-w-md shadow-2xl border-primary/20 relative backdrop-blur-sm bg-card/95">
+                <CardHeader className="space-y-3 text-center">
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Fingerprint className="h-8 w-8 text-primary-foreground" />
+                    </div>
+                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                        Create Account
+                    </CardTitle>
+                    <CardDescription className="text-center text-base">
                         Set up your MiniDrive account with biometric security
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleRegister}>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -111,10 +132,11 @@ export default function RegisterPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 disabled={isLoading}
                                 required
+                                className="h-11 border-primary/20 focus-visible:ring-primary/50"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="username">Username</Label>
+                            <Label htmlFor="username" className="text-sm font-medium">Username</Label>
                             <Input
                                 id="username"
                                 type="text"
@@ -123,10 +145,11 @@ export default function RegisterPage() {
                                 onChange={(e) => setUsername(e.target.value)}
                                 disabled={isLoading}
                                 required
+                                className="h-11 border-primary/20 focus-visible:ring-primary/50"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="deviceName">Device Name</Label>
+                            <Label htmlFor="deviceName" className="text-sm font-medium">Device Name</Label>
                             <Input
                                 id="deviceName"
                                 type="text"
@@ -135,11 +158,12 @@ export default function RegisterPage() {
                                 onChange={(e) => setDeviceName(e.target.value)}
                                 disabled={isLoading}
                                 required
+                                className="h-11 border-primary/20 focus-visible:ring-primary/50"
                             />
                         </div>
                         <Button
                             type="submit"
-                            className="w-full h-12 text-base"
+                            className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -156,10 +180,10 @@ export default function RegisterPage() {
                         </Button>
                     </CardContent>
                 </form>
-                <CardFooter className="flex flex-col space-y-2">
+                <CardFooter className="flex flex-col space-y-2 pb-6">
                     <div className="text-sm text-center text-muted-foreground">
                         Already have an account?{' '}
-                        <Link href="/login" className="text-primary hover:underline font-medium">
+                        <Link href="/login" className="text-primary hover:underline font-semibold transition-colors">
                             Sign in
                         </Link>
                     </div>

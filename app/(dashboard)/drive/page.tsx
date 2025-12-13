@@ -75,7 +75,7 @@ export default function DrivePage() {
     return (
         <div className="flex-1 flex flex-col h-full">
             {/* Header */}
-            <div className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+            <div className="border-b bg-gradient-to-r from-background to-muted/30 backdrop-blur supports-backdrop-filter:bg-background/60 shadow-sm">
                 <div className="flex items-center justify-between px-6 py-4">
                     <Breadcrumbs />
                     <div className="flex items-center gap-2">
@@ -83,17 +83,22 @@ export default function DrivePage() {
                             variant="outline"
                             size="icon"
                             onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+                            className="hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
                         >
                             {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid3x3 className="h-4 w-4" />}
                         </Button>
                         <Button
                             variant="outline"
                             onClick={() => setShowCreateFolder(true)}
+                            className="hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
                         >
                             <FolderPlus className="mr-2 h-4 w-4" />
                             New Folder
                         </Button>
-                        <Button onClick={() => setShowUploadZone(true)}>
+                        <Button 
+                            onClick={() => setShowUploadZone(true)}
+                            className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all"
+                        >
                             <Upload className="mr-2 h-4 w-4" />
                             Upload
                         </Button>
@@ -102,25 +107,34 @@ export default function DrivePage() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 overflow-auto p-6">
+            <div className="flex-1 overflow-auto p-6 bg-gradient-to-br from-background via-background to-muted/20">
                 {files.length === 0 && folders.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                        <div className="rounded-full bg-muted p-6">
-                            <Upload className="h-12 w-12 text-muted-foreground" />
+                    <div className="flex flex-col items-center justify-center h-full text-center space-y-6 animate-in fade-in duration-500">
+                        <div className="rounded-full bg-gradient-to-br from-primary/20 to-primary/5 p-8 border border-primary/20 shadow-lg">
+                            <Upload className="h-16 w-16 text-primary" />
                         </div>
-                        <div className="space-y-2">
-                            <h3 className="text-xl font-semibold">No files yet</h3>
-                            <p className="text-muted-foreground">
+                        <div className="space-y-2 max-w-md">
+                            <h3 className="text-2xl font-bold">No files yet</h3>
+                            <p className="text-muted-foreground text-lg">
                                 Upload your first file or create a folder to get started
                             </p>
                         </div>
-                        <div className="flex gap-2">
-                            <Button onClick={() => setShowUploadZone(true)}>
-                                <Upload className="mr-2 h-4 w-4" />
+                        <div className="flex gap-3">
+                            <Button 
+                                onClick={() => setShowUploadZone(true)}
+                                size="lg"
+                                className="bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all"
+                            >
+                                <Upload className="mr-2 h-5 w-5" />
                                 Upload Files
                             </Button>
-                            <Button variant="outline" onClick={() => setShowCreateFolder(true)}>
-                                <FolderPlus className="mr-2 h-4 w-4" />
+                            <Button 
+                                variant="outline" 
+                                size="lg"
+                                onClick={() => setShowCreateFolder(true)}
+                                className="hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
+                            >
+                                <FolderPlus className="mr-2 h-5 w-5" />
                                 Create Folder
                             </Button>
                         </div>
@@ -129,7 +143,7 @@ export default function DrivePage() {
                     <div
                         className={
                             viewMode === 'grid'
-                                ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4'
+                                ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5'
                                 : 'flex flex-col gap-2'
                         }
                     >

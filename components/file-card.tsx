@@ -136,10 +136,12 @@ export default function FileCard({ file, viewMode, onUpdate }: FileCardProps) {
 
     if (viewMode === 'list') {
         return (
-            <Card className="hover:bg-accent transition-colors">
+            <Card className="hover:bg-accent/50 hover:border-primary/20 transition-all duration-200">
                 <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1">
-                        <Icon className="h-8 w-8 text-muted-foreground shrink-0" />
+                        <div className="rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 p-2 border border-primary/10">
+                            <Icon className="h-6 w-6 text-primary" />
+                        </div>
                         <div className="min-w-0 flex-1">
                             <p className="font-medium truncate">{file.name}</p>
                             <p className="text-sm text-muted-foreground">
@@ -184,18 +186,18 @@ export default function FileCard({ file, viewMode, onUpdate }: FileCardProps) {
 
     return (
         <>
-            <Card className="group hover:shadow-lg transition-all cursor-pointer">
-                <CardContent className="p-4 space-y-3">
+            <Card className="group hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                <CardContent className="p-5 space-y-3">
                     <div className="flex items-start justify-between">
-                        <div className="rounded-lg bg-muted p-3">
-                            <Icon className="h-10 w-10 text-muted-foreground" />
+                        <div className="rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 p-4 border border-primary/10 shadow-sm group-hover:shadow-md group-hover:border-primary/20 transition-all duration-300">
+                            <Icon className="h-10 w-10 text-primary group-hover:scale-110 transition-transform duration-300" />
                         </div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="opacity-0 group-hover:opacity-100 transition-all duration-300"
                                     disabled={isDeleting}
                                 >
                                     {isDeleting ? (
@@ -221,12 +223,12 @@ export default function FileCard({ file, viewMode, onUpdate }: FileCardProps) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                    <div className="space-y-1">
-                        <p className="font-medium truncate" title={file.name}>
+                    <div className="space-y-1.5">
+                        <p className="font-semibold truncate group-hover:text-primary transition-colors" title={file.name}>
                             {file.name}
                         </p>
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>{formatBytes(file.size)}</span>
+                            <span className="font-medium">{formatBytes(file.size)}</span>
                             <span>{formatDate(file.createdAt)}</span>
                         </div>
                     </div>

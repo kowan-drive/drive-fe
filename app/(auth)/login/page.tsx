@@ -71,18 +71,29 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-50 via-zinc-100 to-zinc-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-800 p-4">
-            <Card className="w-full max-w-md shadow-2xl">
-                <CardHeader className="space-y-1">
-                    <CardTitle className="text-3xl font-bold text-center">Welcome Back</CardTitle>
-                    <CardDescription className="text-center">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-primary/5 to-primary/10 p-4 relative overflow-hidden">
+            {/* Animated background elements */}
+            <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-3xl animate-pulse delay-1000"></div>
+            </div>
+
+            <Card className="w-full max-w-md shadow-2xl border-primary/20 relative backdrop-blur-sm bg-card/95">
+                <CardHeader className="space-y-3 text-center">
+                    <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Fingerprint className="h-8 w-8 text-primary-foreground" />
+                    </div>
+                    <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                        Welcome Back
+                    </CardTitle>
+                    <CardDescription className="text-center text-base">
                         Sign in to your MiniDrive account using biometric authentication
                     </CardDescription>
                 </CardHeader>
                 <form onSubmit={handleLogin}>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-5">
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
+                            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
                             <Input
                                 id="email"
                                 type="email"
@@ -91,11 +102,12 @@ export default function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 disabled={isLoading}
                                 required
+                                className="h-11 border-primary/20 focus-visible:ring-primary/50"
                             />
                         </div>
                         <Button
                             type="submit"
-                            className="w-full h-12 text-base"
+                            className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg hover:shadow-xl transition-all duration-300"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -112,10 +124,10 @@ export default function LoginPage() {
                         </Button>
                     </CardContent>
                 </form>
-                <CardFooter className="flex flex-col space-y-2">
+                <CardFooter className="flex flex-col space-y-2 pb-6">
                     <div className="text-sm text-center text-muted-foreground">
                         Don't have an account?{' '}
-                        <Link href="/register" className="text-primary hover:underline font-medium">
+                        <Link href="/register" className="text-primary hover:underline font-semibold transition-colors">
                             Sign up
                         </Link>
                     </div>

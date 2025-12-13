@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import EncryptionSetupDialog from '@/components/encryption-setup-dialog'
 import { hasUserEncryptionKey } from '@/lib/encryption'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export default function DashboardLayout({
     children,
@@ -88,33 +89,39 @@ export default function DashboardLayout({
     return (
         <div className="flex h-screen bg-background">
             {/* Sidebar */}
-            <aside className="w-64 border-r bg-muted/40 flex flex-col">
+            <aside className="w-64 border-r bg-gradient-to-b from-card to-muted/40 flex flex-col shadow-sm">
                 <div className="p-6">
-                    <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <HardDrive className="h-6 w-6" />
-                        MiniDrive
-                    </h1>
-                    <p className="text-xs text-muted-foreground mt-1">Privacy-first storage</p>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="rounded-lg bg-gradient-to-br from-primary to-primary/80 p-2 shadow-md">
+                                <HardDrive className="h-5 w-5 text-primary-foreground" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold">MiniDrive</h1>
+                                <p className="text-[10px] text-muted-foreground">Privacy-first storage</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <Separator />
 
-                <nav className="flex-1 p-4 space-y-2">
+                <nav className="flex-1 p-4 space-y-1">
                     <Link href="/drive">
-                        <Button variant="ghost" className="w-full justify-start">
-                            <HardDrive className="mr-2 h-4 w-4" />
+                        <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary transition-colors">
+                            <HardDrive className="mr-3 h-4 w-4" />
                             My Drive
                         </Button>
                     </Link>
                     <Link href="/shared">
-                        <Button variant="ghost" className="w-full justify-start">
-                            <Share2 className="mr-2 h-4 w-4" />
+                        <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary transition-colors">
+                            <Share2 className="mr-3 h-4 w-4" />
                             Shared Links
                         </Button>
                     </Link>
                     <Link href="/settings">
-                        <Button variant="ghost" className="w-full justify-start">
-                            <Settings className="mr-2 h-4 w-4" />
+                        <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary transition-colors">
+                            <Settings className="mr-3 h-4 w-4" />
                             Settings
                         </Button>
                     </Link>
@@ -125,15 +132,22 @@ export default function DashboardLayout({
 
                     <Separator />
 
+                    <div className="flex items-center justify-between px-1">
+                        <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                        <ThemeToggle />
+                    </div>
+
+                    <Separator />
+
                     <div className="space-y-2">
-                        <div className="text-sm">
-                            <p className="font-medium">{user?.username}</p>
-                            <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <div className="text-sm px-1">
+                            <p className="font-medium truncate">{user?.username}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                         </div>
                         <Button
                             variant="outline"
                             size="sm"
-                            className="w-full"
+                            className="w-full hover:bg-destructive hover:text-destructive-foreground transition-colors"
                             onClick={handleLogout}
                         >
                             <LogOut className="mr-2 h-4 w-4" />
