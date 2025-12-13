@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Copy, Trash2, ExternalLink, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { sharesApi } from '@/lib/api/shares'
 import { formatDate } from '@/lib/utils'
+import { Copy, ExternalLink, Loader2, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export default function SharedPage() {
@@ -88,7 +88,7 @@ export default function SharedPage() {
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-3 max-w-4xl">
+                    <div className="space-y-3">
                         {shares.map((share) => (
                             <Card key={share.id}>
                                 <CardContent className="p-4">
