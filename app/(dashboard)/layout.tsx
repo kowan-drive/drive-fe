@@ -10,7 +10,7 @@ import { hasUserEncryptionKey } from '@/lib/encryption'
 import { useAuthStore } from '@/store/auth'
 import { HardDrive, LogOut, Settings, Share2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -20,6 +20,7 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     const router = useRouter()
+    const pathname = usePathname()
     const { user, isAuthenticated, setUser, logout } = useAuthStore()
     const hasHydrated = useAuthStore((state) => state.hasHydrated)
     const [showEncryptionSetup, setShowEncryptionSetup] = useState(false)
@@ -108,19 +109,40 @@ export default function DashboardLayout({
 
                 <nav className="flex-1 p-4 space-y-1">
                     <Link href="/drive">
-                        <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary transition-colors">
+                        <Button 
+                            variant={pathname === '/drive' ? 'default' : 'ghost'} 
+                            className={`w-full justify-start transition-colors ${
+                                pathname === '/drive' 
+                                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                                    : 'hover:bg-primary/10 hover:text-primary'
+                            }`}
+                        >
                             <HardDrive className="mr-3 h-4 w-4" />
                             My Drive
                         </Button>
                     </Link>
                     <Link href="/shared">
-                        <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary transition-colors">
+                        <Button 
+                            variant={pathname === '/shared' ? 'default' : 'ghost'} 
+                            className={`w-full justify-start transition-colors ${
+                                pathname === '/shared' 
+                                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                                    : 'hover:bg-primary/10 hover:text-primary'
+                            }`}
+                        >
                             <Share2 className="mr-3 h-4 w-4" />
                             Shared Links
                         </Button>
                     </Link>
                     <Link href="/settings">
-                        <Button variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary transition-colors">
+                        <Button 
+                            variant={pathname === '/settings' ? 'default' : 'ghost'} 
+                            className={`w-full justify-start transition-colors ${
+                                pathname === '/settings' 
+                                    ? 'bg-primary text-primary-foreground shadow-sm' 
+                                    : 'hover:bg-primary/10 hover:text-primary'
+                            }`}
+                        >
                             <Settings className="mr-3 h-4 w-4" />
                             Settings
                         </Button>
