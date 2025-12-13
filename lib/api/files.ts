@@ -3,6 +3,8 @@ import apiClient from './client'
 export interface UploadFileRequest {
     file: File
     folderId?: string
+    encryptedFileKey?: string
+    encryptionIv?: string
 }
 
 export interface ListFilesParams {
@@ -17,11 +19,17 @@ export interface MoveFileRequest {
 }
 
 export const filesApi = {
-    uploadFile: async ({ file, folderId }: UploadFileRequest) => {
+    uploadFile: async ({ file, folderId, encryptedFileKey, encryptionIv }: UploadFileRequest) => {
         const formData = new FormData()
         formData.append('file', file)
         if (folderId) {
             formData.append('folderId', folderId)
+        }
+        if (encryptedFileKey) {
+            formData.append('encryptedFileKey', encryptedFileKey)
+        }
+        if (encryptionIv) {
+            formData.append('encryptionIv', encryptionIv)
         }
 
         const response = await apiClient.post('/api/v1/files/upload', formData, {

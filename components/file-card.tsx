@@ -29,6 +29,8 @@ import { FileItem } from '@/store/files'
 import { toast } from 'sonner'
 import ShareDialog from './share-dialog'
 import { triggerStorageUpdate } from '@/lib/storage-events'
+import { useAuthStore } from '@/store/auth'
+import { getUserEncryptionKey, decryptFileKey, decryptFile } from '@/lib/encryption'
 
 interface FileCardProps {
     file: FileItem
@@ -49,22 +51,64 @@ const iconMap: Record<string, any> = {
 export default function FileCard({ file, viewMode, onUpdate }: FileCardProps) {
     const [isDeleting, setIsDeleting] = useState(false)
     const [showShareDialog, setShowShareDialog] = useState(false)
+    const { user } = useAuthStore()
 
     const iconName = getFileIcon(file.name)
     const Icon = iconMap[iconName] || FileIcon
 
     const handleDownload = async () => {
         try {
+            toast.info('Downloading and decrypting file...')
+            
+            // Get file metadata to get encryption keys
+            const metadata = await filesApi.getFileMetadata(file.id)
+            
+            // Download encrypted file
             const response = await filesApi.downloadFile(file.id)
-            const url = window.URL.createObjectURL(new Blob([response.data]))
-            const link = document.createElement('a')
-            link.href = url
-            link.setAttribute('download', file.name)
-            document.body.appendChild(link)
-            link.click()
-            link.remove()
-            window.URL.revokeObjectURL(url)
-            toast.success('Download started')
+            const encryptedBlob = new Blob([response.data])
+            
+            // If file has encryption metadata, decrypt it
+            if (metadata.data.encryptedFileKey && metadata.data.encryptionIv && user) {
+                try {
+                    // Get user's encryption key
+                    const userKey = await getUserEncryptionKey(user.id)
+                    
+                    // Decrypt the file encryption key
+                    const fileKey = await decryptFileKey(
+                        metadata.data.encryptedFileKey,
+                        metadata.data.encryptionIv,
+                        userKey
+                    )
+                    
+                    // Decrypt the file content
+                    const decryptedBlob = await decryptFile(encryptedBlob, fileKey)
+                    
+                    // Download decrypted file
+                    const url = window.URL.createObjectURL(decryptedBlob)
+                    const link = document.createElement('a')
+                    link.href = url
+                    link.setAttribute('download', file.name)
+                    document.body.appendChild(link)
+                    link.click()
+                    link.remove()
+                    window.URL.revokeObjectURL(url)
+                    toast.success('File decrypted and downloaded')
+                } catch (decryptError) {
+                    console.error('Decryption error:', decryptError)
+                    toast.error('Failed to decrypt file')
+                }
+            } else {
+                // Download without decryption (legacy files)
+                const url = window.URL.createObjectURL(encryptedBlob)
+                const link = document.createElement('a')
+                link.href = url
+                link.setAttribute('download', file.name)
+                document.body.appendChild(link)
+                link.click()
+                link.remove()
+                window.URL.revokeObjectURL(url)
+                toast.success('Download started')
+            }
         } catch (error) {
             console.error('Download error:', error)
             toast.error('Failed to download file')
@@ -95,7 +139,7 @@ export default function FileCard({ file, viewMode, onUpdate }: FileCardProps) {
             <Card className="hover:bg-accent transition-colors">
                 <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1">
-                        <Icon className="h-8 w-8 text-muted-foreground flex-shrink-0" />
+                        <Icon className="h-8 w-8 text-muted-foreground shrink-0" />
                         <div className="min-w-0 flex-1">
                             <p className="font-medium truncate">{file.name}</p>
                             <p className="text-sm text-muted-foreground">

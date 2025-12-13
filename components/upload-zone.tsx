@@ -3,13 +3,15 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { Upload, X, FileIcon, Loader2 } from 'lucide-react'
+import { Upload, X, FileIcon, Loader2, Lock } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { useFilesStore } from '@/store/files'
 import { filesApi } from '@/lib/api/files'
 import { formatBytes } from '@/lib/utils'
 import { toast } from 'sonner'
 import { triggerStorageUpdate } from '@/lib/storage-events'
+import { encryptFile, generateFileKey, encryptFileKey, getUserEncryptionKey, exportKey } from '@/lib/encryption'
+import { useAuthStore } from '@/store/auth'
 
 interface UploadZoneProps {
     open: boolean
@@ -25,9 +27,11 @@ interface UploadFile {
 
 export default function UploadZone({ open, onOpenChange, onUploadComplete }: UploadZoneProps) {
     const { currentFolderId } = useFilesStore()
+    const { user } = useAuthStore()
     const [uploadFiles, setUploadFiles] = useState<UploadFile[]>([])
     const [isDragging, setIsDragging] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
+    const [isEncrypting, setIsEncrypting] = useState(false)
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault()
@@ -67,47 +71,89 @@ export default function UploadZone({ open, onOpenChange, onUploadComplete }: Upl
 
     const handleUpload = async () => {
         if (uploadFiles.length === 0) return
-
-        setIsUploading(true)
-
-        for (let i = 0; i < uploadFiles.length; i++) {
-            const uploadFile = uploadFiles[i]
-
-            try {
-                // Update progress
-                setUploadFiles(prev =>
-                    prev.map((f, idx) =>
-                        idx === i ? { ...f, progress: 50 } : f
-                    )
-                )
-
-                await filesApi.uploadFile({
-                    file: uploadFile.file,
-                    folderId: currentFolderId || undefined,
-                })
-
-                // Update progress to 100%
-                setUploadFiles(prev =>
-                    prev.map((f, idx) =>
-                        idx === i ? { ...f, progress: 100 } : f
-                    )
-                )
-            } catch (error) {
-                console.error('Upload error:', error)
-                setUploadFiles(prev =>
-                    prev.map((f, idx) =>
-                        idx === i ? { ...f, error: 'Upload failed' } : f
-                    )
-                )
-            }
+        if (!user) {
+            toast.error('User not found')
+            return
         }
 
-        setIsUploading(false)
-        toast.success('Files uploaded successfully')
-        setUploadFiles([])
-        triggerStorageUpdate()
-        onUploadComplete()
-        onOpenChange(false)
+        setIsUploading(true)
+        setIsEncrypting(true)
+
+        try {
+            // Get user's encryption key
+            const userKey = await getUserEncryptionKey(user.id)
+
+            for (let i = 0; i < uploadFiles.length; i++) {
+                const uploadFile = uploadFiles[i]
+
+                try {
+                    // Step 1: Generate file-specific encryption key
+                    setUploadFiles(prev =>
+                        prev.map((f, idx) =>
+                            idx === i ? { ...f, progress: 10 } : f
+                        )
+                    )
+                    const fileKey = await generateFileKey()
+
+                    // Step 2: Encrypt the file
+                    setUploadFiles(prev =>
+                        prev.map((f, idx) =>
+                            idx === i ? { ...f, progress: 30 } : f
+                        )
+                    )
+                    const encryptedFileBlob = await encryptFile(uploadFile.file, fileKey)
+
+                    // Step 3: Encrypt the file key with user's key
+                    setUploadFiles(prev =>
+                        prev.map((f, idx) =>
+                            idx === i ? { ...f, progress: 50 } : f
+                        )
+                    )
+                    const { encryptedKey, iv } = await encryptFileKey(fileKey, userKey)
+
+                    // Step 4: Upload encrypted file
+                    setIsEncrypting(false)
+                    const encryptedFile = new File(
+                        [encryptedFileBlob],
+                        uploadFile.file.name,
+                        { type: uploadFile.file.type }
+                    )
+
+                    await filesApi.uploadFile({
+                        file: encryptedFile,
+                        folderId: currentFolderId || undefined,
+                        encryptedFileKey: encryptedKey,
+                        encryptionIv: iv,
+                    })
+
+                    // Update progress to 100%
+                    setUploadFiles(prev =>
+                        prev.map((f, idx) =>
+                            idx === i ? { ...f, progress: 100 } : f
+                        )
+                    )
+                } catch (error) {
+                    console.error('Upload error:', error)
+                    setUploadFiles(prev =>
+                        prev.map((f, idx) =>
+                            idx === i ? { ...f, error: 'Upload failed' } : f
+                        )
+                    )
+                }
+            }
+
+            setIsUploading(false)
+            toast.success('Files encrypted and uploaded successfully')
+            setUploadFiles([])
+            triggerStorageUpdate()
+            onUploadComplete()
+            onOpenChange(false)
+        } catch (error) {
+            console.error('Encryption error:', error)
+            toast.error('Failed to encrypt files')
+            setIsUploading(false)
+            setIsEncrypting(false)
+        }
     }
 
     return (
@@ -156,7 +202,7 @@ export default function UploadZone({ open, onOpenChange, onUploadComplete }: Upl
                                 key={index}
                                 className="flex items-center gap-3 p-3 border rounded-lg"
                             >
-                                <FileIcon className="h-8 w-8 text-muted-foreground flex-shrink-0" />
+                                <FileIcon className="h-8 w-8 text-muted-foreground shrink-0" />
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium truncate">
                                         {uploadFile.file.name}

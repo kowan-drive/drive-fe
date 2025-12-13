@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation'
 import { Download, Loader2, Clock, FileIcon, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -105,11 +104,11 @@ export default function SharePage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <Alert variant="destructive">
-                            <AlertDescription>
+                        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+                            <p className="text-sm text-destructive">
                                 {error || 'This share link is invalid, expired, or has reached its download limit.'}
-                            </AlertDescription>
-                        </Alert>
+                            </p>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
@@ -123,7 +122,7 @@ export default function SharePage() {
             <Card className="w-full max-w-md overflow-hidden">
                 <CardHeader className="overflow-hidden">
                     <div className="flex items-center gap-3 min-w-0">
-                        <div className="p-3 rounded-lg bg-primary/10 flex-shrink-0">
+                        <div className="p-3 rounded-lg bg-primary/10 shrink-0">
                             <FileIcon className="h-6 w-6 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0 overflow-hidden">

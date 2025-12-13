@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
 import { authApi } from '@/lib/api/auth'
@@ -10,6 +10,8 @@ import StorageMeter from '@/components/storage-meter'
 import Link from 'next/link'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
+import EncryptionSetupDialog from '@/components/encryption-setup-dialog'
+import { hasUserEncryptionKey } from '@/lib/encryption'
 
 export default function DashboardLayout({
     children,
@@ -19,6 +21,7 @@ export default function DashboardLayout({
     const router = useRouter()
     const { user, isAuthenticated, setUser, logout } = useAuthStore()
     const hasHydrated = useAuthStore((state) => state.hasHydrated)
+    const [showEncryptionSetup, setShowEncryptionSetup] = useState(false)
 
     useEffect(() => {
         // Wait for hydration before checking auth
@@ -34,8 +37,20 @@ export default function DashboardLayout({
         // Load user data if not already loaded
         if (!user) {
             loadUser()
+        } else {
+            // Check if user has encryption key
+            checkEncryptionSetup()
         }
     }, [isAuthenticated, hasHydrated, user])
+
+    const checkEncryptionSetup = async () => {
+        if (user) {
+            const hasKey = await hasUserEncryptionKey(user.id)
+            if (!hasKey) {
+                setShowEncryptionSetup(true)
+            }
+        }
+    }
 
     const loadUser = async () => {
         try {
@@ -132,6 +147,10 @@ export default function DashboardLayout({
             <main className="flex-1 flex flex-col overflow-hidden">
                 {children}
             </main>
-        </div>
+            {/* Encryption Setup Dialog */}
+            <EncryptionSetupDialog 
+                open={showEncryptionSetup} 
+                onOpenChange={setShowEncryptionSetup}
+            />        </div>
     )
 }

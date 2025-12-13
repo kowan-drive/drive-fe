@@ -190,7 +190,7 @@ export default function SettingsPage() {
                             <ul className="space-y-2">
                               {tier.features.map((feature: string, index: number) => (
                                 <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                  <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                                  <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                                   <span>{feature}</span>
                                 </li>
                               ))}

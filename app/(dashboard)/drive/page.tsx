@@ -75,7 +75,7 @@ export default function DrivePage() {
     return (
         <div className="flex-1 flex flex-col h-full">
             {/* Header */}
-            <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
                 <div className="flex items-center justify-between px-6 py-4">
                     <Breadcrumbs />
                     <div className="flex items-center gap-2">

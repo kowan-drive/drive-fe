@@ -70,7 +70,7 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-50 via-zinc-100 to-zinc-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-800 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-zinc-50 via-zinc-100 to-zinc-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-800 p-4">
             <Card className="w-full max-w-md shadow-2xl">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-3xl font-bold text-center">Welcome Back</CardTitle>
